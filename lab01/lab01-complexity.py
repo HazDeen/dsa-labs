@@ -205,8 +205,31 @@ def self_check() -> None:
         x, n = rng.randint(2, 50), rng.randint(0, 64)
         assert binary_pow(x, n, mod=POW_MOD) == pow(x, n, POW_MOD)
 
-    # TODO: добавить собственные проверки инвариантов и описать их в отчёте
-    # (например: count_equal_pairs на массиве из попарно различных элементов = 0).
+    # 1. Инвариант array_sum: сумма склеенных списков равна сумме их сумм
+    list1 = [1, 2, 3]
+    list2 = [4, 5, 6]
+    assert array_sum(list1 + list2) == array_sum(list1) + array_sum(list2)
+    # Сумма одинаковых чисел равна их количеству умножить на само число (4 * 5 = 20)
+    assert array_sum([5, 5, 5, 5]) == 4 * 5
+
+    # 2. Инвариант array_max: найденный максимум не меньше любого числа из массива
+    test_arr = [3, 17, 8, 4, 17, 2]
+    found_max = array_max(test_arr)
+    assert all(found_max >= x for x in test_arr)
+
+    # 3. Инварианты count_equal_pairs:
+    # если числа разные — пар 0
+    assert count_equal_pairs([1, 2, 3, 4, 5]) == 0
+    # если числа одинаковые — пар строго n * (n - 1) // 2 (для 4 чисел: 4 * 3 // 2 = 6)
+    assert count_equal_pairs([7, 7, 7, 7]) == 6
+
+    # 4. Инварианты binary_pow:
+    # при умножении степени складываются: 2^3 * 2^4 = 2^7 (8 * 16 = 128)
+    assert binary_pow(2, 3) * binary_pow(2, 4) == binary_pow(2, 7)
+    assert (binary_pow(2, 3, mod=100) * binary_pow(2, 4, mod=100)) % 100 == binary_pow(2, 7, mod=100)
+    # единица в любой степени всегда равна 1
+    assert binary_pow(1, 100) == 1
+
     print("self_check: OK")
 
 
