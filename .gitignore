@@ -9,7 +9,6 @@ __pycache__/
 # Данные замеров и локальные отчеты
 data/generated/
 data-structures-and-algorithms
-*.png
 
 
 # Операционные системы / редакторы
