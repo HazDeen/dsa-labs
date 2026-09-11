@@ -76,9 +76,9 @@ def array_max(a: list[int]) -> int:
     с каждым следующим. Число сравнений всегда равно n - 1.
     """
     max_val = a[0]
-    for x in a[1:]:
-        if x > max_val:
-            max_val = x
+    for i in range(1, len(a)):
+        if a[i] > max_val:
+            max_val = a[i]
     return max_val
 
 
