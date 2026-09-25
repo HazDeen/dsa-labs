@@ -228,24 +228,71 @@ class Deque:
         return self._size
 
     def push_front(self, value) -> None:
-        """Добавить элемент в начало. Сложность: TODO."""
-        # TODO: создать узел, перевязать ссылки head (учесть пустой дек)
-        raise NotImplementedError
+        """Добавить элемент в начало. Сложность: O(1)."""
+        new_node = _Node(value)
+        if self._size == 0:
+            # Если дек пуст, новый узел — это и голова, и хвост
+            self._head = new_node
+            self._tail = new_node
+        else:
+            # Новый узел встает перед текущей головой
+            new_node.next = self._head
+            self._head.prev = new_node
+            self._head = new_node
+        self._size += 1
 
     def push_back(self, value) -> None:
-        """Добавить элемент в конец. Сложность: TODO."""
-        # TODO: симметрично push_front для tail
-        raise NotImplementedError
+        """Добавить элемент в конец. Сложность: O(1)."""
+        new_node = _Node(value)
+        if self._size == 0:
+            # Если дек пуст, новый узел — это и голова, и хвост
+            self._head = new_node
+            self._tail = new_node
+        else:
+            # Новый узел встает после текущего хвоста
+            new_node.prev = self._tail
+            self._tail.next = new_node
+            self._tail = new_node
+        self._size += 1
 
     def pop_front(self):
-        """Извлечь элемент из начала; для пустого дека — IndexError."""
-        # TODO: учесть переход к пустому деку (tail тоже обнуляется)
-        raise NotImplementedError
+        """Извлечь элемент из начала; для пустого дека — IndexError. Сложность: O(1)."""
+        if self._size == 0:
+            raise IndexError("pop from empty deque")
+
+        val = self._head.value
+        # Сдвигаем голову на следующий элемент
+        self._head = self._head.next
+
+        if self._head is None:
+            # Если голова стала None, значит в списке был всего 1 элемент
+            # Хвост тоже нужно обнулить
+            self._tail = None
+        else:
+            # У новой головы больше нет предыдущего элемента
+            self._head.prev = None
+
+        self._size -= 1
+        return val
 
     def pop_back(self):
-        """Извлечь элемент из конца; для пустого дека — IndexError."""
-        # TODO
-        raise NotImplementedError
+        """Извлечь элемент из конца; для пустого дека — IndexError. Сложность: O(1)."""
+        if self._size == 0:
+            raise IndexError("pop from empty deque")
+
+        val = self._tail.value
+        # Сдвигаем хвост на предыдущий элемент
+        self._tail = self._tail.prev
+
+        if self._tail is None:
+            # Если хвост стал None, список опустел
+            self._head = None
+        else:
+            # У нового хвоста больше нет следующего элемента
+            self._tail.next = None
+
+        self._size -= 1
+        return val
 
 
 # ---------------------------------------------------------------------------
