@@ -394,25 +394,73 @@ def inserts_front_deque(n: int) -> None:
     for i in range(n):
         d.appendleft(i)
 
+def inserts_front_custom_deque(n: int) -> None:
+    """n вставок в начало нашего Deque — ожидаемо O(1) на операцию."""
+    d = Deque()
+    for i in range(n):
+        d.push_front(i)
+
+
 
 def run_benchmarks(seed: int) -> None:
-    """Средняя стоимость append и сравнение вставки в начало list/deque."""
+    """Средняя стоимость append, сравнение вставки в начало и построение графиков."""
+    import matplotlib.pyplot as plt
+
     rng = random.Random(seed)
-    _ = rng.random()  # данные варианта фиксируются seed (см. reproducibility.md)
+    _ = rng.random()
+
+    # 1. Замеры DynamicArray.append
     print("\nСредняя стоимость append (DynamicArray), демонстрация амортизированной O(1):")
+    t_per_op = []
     for n in SIZES:
         t = bench(appends_dynamic_array, n)
-        print(f"  n={n:>7}  всего t={t:.6f} c  на операцию t/n={t / n:.3e} c")
-    print("\nВставка в начало: list.insert(0, x) против deque.appendleft:")
-    for n in SIZES:
-        if n > 30_000:
-            continue  # вставка в начало list квадратична по суммарному времени
-        t_list = bench(inserts_front_list, n)
-        t_deque = bench(inserts_front_deque, n)
-        print(f"  n={n:>7}  list={t_list:.6f} c  deque={t_deque:.6f} c")
-    # TODO: снять аналогичные замеры для push_front своего Deque;
-    # TODO: построить график t/n от n для append и включить его в отчёт;
-    # TODO: провести амортизированный анализ push_back методом учёта (в отчёте).
+        op_time = t / n
+        t_per_op.append(op_time)
+        print(f"  n={n:>7}  всего t={t:.6f} c  на операцию t/n={op_time:.3e} c")
+
+    # 2. Замеры вставки в начало
+    print("\nВставка в начало: list.insert(0, x) против Deque и collections.deque:")
+    sizes_front = [n for n in SIZES if n <= 30_000]
+    times_list = []
+    times_custom_deque = []
+    times_std_deque = []
+
+    for n in sizes_front:
+        tl = bench(inserts_front_list, n)
+        tcd = bench(inserts_front_custom_deque, n)
+        tsd = bench(inserts_front_deque, n)
+        times_list.append(tl)
+        times_custom_deque.append(tcd)
+        times_std_deque.append(tsd)
+        print(f"  n={n:>7}  list={tl:.6f} c  my_deque={tcd:.6f} c  std_deque={tsd:.6f} c")
+
+    # Построение графика 1: Амортизированная стоимость append
+    plt.figure(figsize=(8, 5))
+    plt.plot(SIZES, t_per_op, marker="o", color="blue", label="DynamicArray t/n")
+    plt.xscale("log")
+    plt.title("Амортизированная стоимость append (DynamicArray)")
+    plt.xlabel("Размер массива n (log scale)")
+    plt.ylabel("Время одной операции t/n (с)")
+    plt.grid(True, which="both", ls="--", alpha=0.5)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig("reports/lab02_append_amortized.png", dpi=150)
+    plt.close()
+
+    # Построение графика 2: Вставка в начало
+    plt.figure(figsize=(8, 5))
+    plt.plot(sizes_front, times_list, marker="o", color="red", label="list.insert(0, x) - O(n²)")
+    plt.plot(sizes_front, times_custom_deque, marker="s", color="green", label="My Deque.push_front - O(n)")
+    plt.plot(sizes_front, times_std_deque, marker="^", color="purple", label="collections.deque - O(n)")
+    plt.title("Сравнение времени n вставок в начало")
+    plt.xlabel("Количество операций n")
+    plt.ylabel("Суммарное время (с)")
+    plt.grid(True, ls="--", alpha=0.5)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig("reports/lab02_insert_front.png", dpi=150)
+    plt.close()
+    print("\nГрафики сохранены в папку reports/")
 
 
 def main() -> None:
