@@ -177,19 +177,28 @@ class Stack:
         return len(self._data)
 
     def push(self, value) -> None:
-        """Положить элемент на вершину. Амортизированная сложность: TODO."""
-        # TODO: делегировать DynamicArray.append
-        raise NotImplementedError
+        """Положить элемент на вершину. Амортизированная сложность: O(1)."""
+        self._data.append(value)
 
     def pop(self):
-        """Снять элемент с вершины; для пустого стека — IndexError."""
-        # TODO: прочитать последний элемент, уменьшить размер
-        raise NotImplementedError
+        """Снять элемент с вершины; для пустого стека — IndexError.
+        Сложность: O(1).
+        """
+        if len(self._data) == 0:
+            raise IndexError("pop from empty stack")
+        
+        last_index = len(self._data) - 1
+        val = self._data.get(last_index)
+        self._data._size -= 1
+        return val
 
     def peek(self):
-        """Вернуть вершину без удаления; для пустого стека — IndexError."""
-        # TODO
-        raise NotImplementedError
+        """Вернуть вершину без удаления; для пустого стека — IndexError.
+        Сложность: O(1).
+        """
+        if len(self._data) == 0:
+            raise IndexError("peek from empty stack")
+        return self._data.get(len(self._data) - 1)
 
 
 class _Node:
